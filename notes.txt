@@ -1,0 +1,16 @@
+--->all the modules with type definition are needed as a part of development
+    so intsall them as a devdependencies  npm i @types/modules
+--->but still we need the regular npm modules for production which is used by the js files
+
+--->explicity type the process.env in src/types/env.d.ts
+    ```
+    declare namespace NodeJS {
+        interface ProcessEnv {
+            mongodb_connection_URl: string; // Add the environment variable with its type
+        }
+    }
+    ```
+if not all the .env variables are not identified by the ts so use fallback value 
+    ```await mongoose.connect(mongoUrl || ''); ```
+
+    
