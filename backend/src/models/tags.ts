@@ -1,4 +1,5 @@
 import mongoose,{Schema,Document,Types} from "mongoose";
+import {User} from './User'
 
 export interface ITags extends Document{
     title:string;

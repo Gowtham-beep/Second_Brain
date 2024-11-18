@@ -1,5 +1,6 @@
 import mongoose,{Schema,Document,Types} from "mongoose";
-
+import {User} from './User'
+import {Tags} from './tags'
 export interface Icontent extends Document{
     link:string;
     type:'video'|'image'|'document';
