@@ -1,6 +1,6 @@
 import mongoose,{Schema,Document,Types} from "mongoose";
 
-interface Icontent extends Document{
+export interface Icontent extends Document{
     link:string;
     type:'video'|'image'|'document';
     title:string;
