@@ -13,4 +13,5 @@
 if not all the .env variables are not identified by the ts so use fallback value 
     ```await mongoose.connect(mongoUrl || ''); ```
 
-    
+--->Do not push the js files to the git hub during deployment using ```tsc ``` js files 
+    are generated ony push .ts to the github
