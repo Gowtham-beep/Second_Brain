@@ -1,28 +1,29 @@
 import express, { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { User } from "../models/User";
+import {z, ZodError} from 'zod';
 
 dotenv.config();
 
-// Shape of the request body TS Interface
-export interface SignupBody {
-    username: string;
-    password: string;
-}
-export interface SigninBody {
-    username: string;
-    password: string;
-}
+//Zod schemas for validation
+const signupSchema=z.object({
+    username:z.string().min(3,"username must be at leat 3 chars long"),
+    password:z.string().min(8,"password must be at least 8 chars long"),
+});
+const signinSchema=z.object({
+    username:z.string().min(3,"username must be at leat 3 chars long"),
+    password:z.string().min(8,"password must be at least 8 chars long"),
+});
 
 // Signup Endpoint
-export const Signup: RequestHandler<{}, {}, SignupBody> = async (req, res): Promise<void> => {
-    const { username, password } = req.body;
-    const saltRounds = 10;
+export const Signup: RequestHandler = async (req, res): Promise<void> => {
+    
 
     try {
+        const{username,password}=signupSchema.parse(req.body);
+        const saltRounds = 10;
         // Check if the user already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
@@ -42,18 +43,25 @@ export const Signup: RequestHandler<{}, {}, SignupBody> = async (req, res): Prom
             username,
         });
     } catch (error) {
-        res.status(500).json({
-            message: "Error in creating user",
-            error: (error as Error).message,
-        });
+        if(error instanceof z.ZodError){
+            res.status(400).json({errors:error.errors});
+            return;
+        }else{
+            res.status(500).json({
+                message: "Error in creating user",
+                error: (error as Error).message,
+            });
+        }
+        
     }
 };
 
 // Signin Endpoint
-export const Signin: RequestHandler<{}, {}, SigninBody> = async (req, res): Promise<void> => {
-    const { username, password } = req.body;
-
+export const Signin: RequestHandler= async (req, res): Promise<void> => {
+    
     try {
+        const { username, password } = signinSchema.parse(req.body);
+
         // Check if the user exists
         const user = await User.findOne({ username });
         if (!user) {
@@ -76,9 +84,15 @@ export const Signin: RequestHandler<{}, {}, SigninBody> = async (req, res): Prom
             token,
         });
     } catch (error) {
-        res.status(500).json({
-            message: "Server error",
-            error: (error as Error).message,
-        });
+        if(error instanceof ZodError){
+            res.status(400).json({errors:error.errors});
+            return;
+        }else{
+            res.status(500).json({
+                message: "Server error",
+                error: (error as Error).message,
+            });
+        }
+        
     }
 };
