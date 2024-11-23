@@ -1,17 +1,101 @@
---->all the modules with type definition are needed as a part of development
-    so intsall them as a devdependencies  npm i @types/modules
---->but still we need the regular npm modules for production which is used by the js files
+import express, { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+import { User } from '../DB/index';
 
---->explicity type the process.env in src/types/env.d.ts
-    ```
-    declare namespace NodeJS {
-        interface ProcessEnv {
-            mongodb_connection_URl: string; // Add the environment variable with its type
+dotenv.config();
+
+const router = express.Router();
+
+// Define the shape of the request body using TypeScript interfaces
+interface SignupRequestBody {
+    username: string;
+    password: string;
+}
+
+interface SigninRequestBody {
+    username: string;
+    password: string;
+}
+
+// Signup Endpoint
+router.post('/signup', async (req: Request<{}, {}, SignupRequestBody>, res: Response) => {
+    const { username, password } = req.body;
+    const saltRounds = 10;
+
+    try {
+        const user = await User.findOne({ username });
+        if (user) {
+            return res.status(403).json({
+                message: "User already exists"
+            });
         }
-    }
-    ```
-if not all the .env variables are not identified by the ts so use fallback value 
-    ```await mongoose.connect(mongoUrl || ''); ```
 
---->Do not push the js files to the git hub during deployment using ```tsc ``` js files 
-    are generated ony push .ts to the github
+        bcrypt.hash(password, saltRounds, async (err, hash) => {
+            if (err) {
+                return res.status(500).json({
+                    message: "Error in hashing the password",
+                    error: err.message
+                });
+            }
+
+            const newUser = new User({ username, hash });
+            await newUser.save();
+
+            return res.status(201).json({
+                message: "Signup successful",
+                username,
+                hash
+            });
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error in creating user",
+            error: (error as Error).message
+        });
+    }
+});
+
+// Signin Endpoint
+router.post('/signin', async (req: Request<{}, {}, SigninRequestBody>, res: Response) => {
+    const { username, password } = req.body;
+
+    try {
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        bcrypt.compare(password, user.hash, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    message: "Error during password comparison"
+                });
+            }
+            if (result) {
+                const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || '', { expiresIn: '1h' });
+                return res.json({
+                    token,
+                    message: "Password matched"
+                });
+            } else {
+                return res.status(401).json({
+                    message: "Password mismatch"
+                });
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Server error",
+            error: (error as Error).message
+        });
+    }
+});
+
+export default router;
