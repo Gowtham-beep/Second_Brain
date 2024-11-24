@@ -55,3 +55,23 @@ export const updateContent:RequestHandler=async(req,res)=>{
             });
     }
 }
+
+export const deleteContent:RequestHandler=async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const deletedContent= await Content.findByIdAndDelete(id);
+        if(!deletedContent){
+            res.status(404).json({message:"Contnet not found"});
+            return;
+        }
+        res.status(200).json({
+            message:"Content deleted successfully",
+            content:deletedContent,
+        });
+    }catch(error){
+        res.status(500).json({
+            message:"Error deleting content",
+            error:(error as Error).message,
+        });
+    }
+}
