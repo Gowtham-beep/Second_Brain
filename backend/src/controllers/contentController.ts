@@ -2,6 +2,7 @@ import {RequestHandler} from 'express';
 import {Content} from '../models/Content';
 import {Tags} from '../models/Tags';
 
+//create Content
 export const createContent:RequestHandler=async(req,res)=>{
     try{
         const{link,type,title,tags,userId}=req.body;
@@ -21,10 +22,10 @@ export const createContent:RequestHandler=async(req,res)=>{
     }
 
 };
-
+//get Content
 export const getContents:RequestHandler=async(req,res)=>{
     try{
-        const contents= await Content.find().populate("userId");
+        const contents= await Content.find().populate("tags").populate("userId");
         res.status(200).json({contents});
     }catch(error){
         res.status(500).json({
@@ -33,3 +34,24 @@ export const getContents:RequestHandler=async(req,res)=>{
         });
     }
 };
+//update Content
+export const updateContent:RequestHandler=async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const updatedData=req.body;
+        const updatedContent=await Content.findByIdAndUpdate(id,updatedData,{new:true});
+        if(!updatedContent){
+            res.status(404).json({message:"Content not found"});
+            return;
+        }
+        res.status(200).json({
+            message:"Content Updated successfully",
+            content:updatedContent,
+        });
+        }catch(error){
+            res.status(500).json({
+                message:"Eroor in updating content",
+                error:(error as Error).message,
+            });
+    }
+}
