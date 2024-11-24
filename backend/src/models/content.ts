@@ -6,7 +6,7 @@ export interface Icontent extends Document{
     type:'video'|'image'|'document';
     title:string;
     tags:Types.ObjectId[];
-    UserId:Types.ObjectId;
+    userId:Types.ObjectId;
 }
 
 const contentSchema:Schema = new Schema({
@@ -18,7 +18,7 @@ const contentSchema:Schema = new Schema({
   },
   title:{type:String,required:true},
   tags:[{type:Schema.ObjectId,ref:'Tags'}],
-  UserId:{type:Schema.ObjectId,ref:'User',required:true}
+  userId:{type:Schema.ObjectId,ref:'User',required:true}
 })
 
 export const Content=mongoose.model<Icontent>('Content',contentSchema)
