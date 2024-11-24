@@ -24,7 +24,7 @@ export const createContent:RequestHandler=async(req,res)=>{
 
 export const getContents:RequestHandler=async(req,res)=>{
     try{
-        const contents= await Content.find().populate("tags").populate("userId");
+        const contents= await Content.find().populate("userId");
         res.status(200).json({contents});
     }catch(error){
         res.status(500).json({
