@@ -9,8 +9,8 @@ const app:Application=express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/user',auth)
-// app.use('/content',content)
+app.use('api/v1/user',auth)
+// app.use('api/v1/content',content)
 
 
 DatabaseConnection()
