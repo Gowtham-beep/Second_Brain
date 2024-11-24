@@ -3,15 +3,17 @@ import cors from 'cors'
 import {DatabaseConnection} from './db/db';
 import auth  from './routes/auth'
 import  content from './routes/content';
+import tags from './routes/tags'
 
 
 const app:Application=express();
 //middlewares
 app.use(cors());
 app.use(express.json());
-
+//routes
 app.use('/api/v1/user',auth)
 app.use('/api/v1/content',content)
+app.use('/api/v1/tags',tags)
 
 
 DatabaseConnection()

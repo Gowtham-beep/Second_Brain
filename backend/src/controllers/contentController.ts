@@ -1,6 +1,6 @@
 import {RequestHandler} from 'express';
 import {Content} from '../models/Content';
-import {Tags} from '../models/Tags';
+
 
 //create Content
 export const createContent:RequestHandler=async(req,res)=>{
