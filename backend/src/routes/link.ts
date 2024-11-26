@@ -1,8 +1,9 @@
 import express from "express";
-import {generateLink} from '../controllers/shareController';
+import {generateLink,getContentByLink} from '../controllers/shareController';
 
 const router = express.Router();
 
-router.post("/generateLink",generateLink);
+router.post("/generatelink",generateLink);
+router.get("/contents/:hash",getContentByLink);
 
 export default router;
