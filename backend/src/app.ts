@@ -4,6 +4,7 @@ import {DatabaseConnection} from './db/db';
 import auth  from './routes/auth'
 import  content from './routes/content';
 import tags from './routes/tags'
+import link from './routes/link'
 
 
 const app:Application=express();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/api/v1/user',auth)
 app.use('/api/v1/content',content)
 app.use('/api/v1/tags',tags)
+app.use('/api/v1/sharables',link)
 
 
 DatabaseConnection()
